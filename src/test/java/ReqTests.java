@@ -12,15 +12,15 @@ public class ReqTests extends TestBase {
     @DisplayName("Успешное получение списка пользователей")
     void successfulListUsersTest() {
 
-   Response response = given()
+        Response response = given()
                 .log().uri()
                 .when()
                 .get("/users?page=1")
                 .then()
                 .extract().response();
 
-            assertThat(response.getStatusCode()).isEqualTo(200);
-            assertThat(response.getBody().asString()).contains("\"id\":1,\"email\":\"george.bluth@reqres.in\"");
+        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.getBody().asString()).contains("\"id\":1,\"email\":\"george.bluth@reqres.in\"");
     }
 
     @Test
