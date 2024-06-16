@@ -12,11 +12,15 @@ public class ReqTests extends TestBase {
     @DisplayName("Успешное получение списка пользователей")
     void successfulListUsersTest() {
 
+        int pageNum = 1;
+
         Response response = given()
-                .log().uri()
+                .log().all()
+                .queryParam("page", pageNum)
                 .when()
-                .get("/users?page=1")
+                .get("/users")
                 .then()
+                .log().all()
                 .extract().response();
 
         assertThat(response.getStatusCode()).isEqualTo(200);
@@ -26,18 +30,18 @@ public class ReqTests extends TestBase {
     @Test
     @DisplayName("Успешное создание пользователя")
     void successfulCreateUserTest() {
+
         String userData = "{\"name\": \"daria\", \"job\": \"leader\"}";
 
         Response response = given()
                 .body(userData)
                 .contentType(JSON)
-                .log().uri()
-                .log().body()
+                .log().all()
 
                 .when()
                 .post("/users")
                 .then()
-                .log().body()
+                .log().all()
                 .extract()
                 .response();
 
@@ -50,18 +54,18 @@ public class ReqTests extends TestBase {
     @Test
     @DisplayName("Успешная регистрация пользователя")
     void successfulRegisterTest() {
+
         String registerData = "{\"email\": \"eve.holt@reqres.in\", \"password\": \"pistol\"}";
 
         Response response = given()
                 .body(registerData)
                 .contentType(JSON)
-                .log().uri()
-                .log().body()
+                .log().all()
 
                 .when()
                 .post("/register")
                 .then()
-                .log().body()
+                .log().all()
                 .extract()
                 .response();
 
@@ -78,13 +82,12 @@ public class ReqTests extends TestBase {
         Response response = given()
                 .body(registerData)
                 .contentType(JSON)
-                .log().uri()
-                .log().body()
+                .log().all()
 
                 .when()
                 .post("/register")
                 .then()
-                .log().body()
+                .log().all()
                 .extract()
                 .response();
 
@@ -99,12 +102,12 @@ public class ReqTests extends TestBase {
         int id = 467898908;
 
         Response response = given()
-                .log().uri()
-                .log().body()
+                .log().all()
 
                 .when()
                 .get("/unknown/" + id)
                 .then()
+                .log().all()
                 .extract()
                 .response();
 
