@@ -1,10 +1,7 @@
 package tests;
 
 import io.restassured.response.Response;
-import models.lombok.CreateUserRequestBodyModel;
-import models.lombok.CreateUserResponseBodyModel;
-import models.lombok.RegisterRequestBodyModel;
-import models.lombok.RegisterResponseBodyModel;
+import models.lombok.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -42,10 +39,10 @@ public class ReqTests extends TestBase {
                 .as(CreateUserResponseBodyModel.class));
 
         step("Check response", ()-> {
-            assertThat(response.toString()).contains("name=daria");
-            assertThat(response.toString()).contains("job=leader");
-            assertThat(response.toString()).contains("id");
-            assertThat(response.toString()).contains("createdAt");
+            assertThat(response.getName()).isEqualTo("daria");
+            assertThat(response.getJob()).isEqualTo("leader");
+            assertThat(response.getId()).isNotEmpty();
+            assertThat(response.getCreatedAt()).isNotEmpty();
         });
     }
 
@@ -70,8 +67,8 @@ public class ReqTests extends TestBase {
                 .as(RegisterResponseBodyModel.class));
 
         step("Check response", ()-> {
-            assertThat(response.toString()).contains("id");
-            assertThat(response.toString()).contains("token");
+            assertThat(response.getId()).isNotNull();
+            assertThat(response.getToken()).isNotEmpty();
         });
     }
 
@@ -95,7 +92,7 @@ public class ReqTests extends TestBase {
                 .as(RegisterResponseBodyModel.class));
 
         step("Check response", ()-> {
-            assertThat(response.toString()).contains("error=Missing password");
+            assertThat(response.getError()).isEqualTo("Missing password");
         });
 
     }
@@ -106,7 +103,8 @@ public class ReqTests extends TestBase {
 
         int id = 467898908;
 
-        Response response = given(unknownResourceRequestSpec)
+        Response response =  step("Make get unknown id request", () ->
+                given(unknownResourceRequestSpec)
 
                 .when()
                 .get("/unknown/" + id)
@@ -114,9 +112,11 @@ public class ReqTests extends TestBase {
                 .then()
                 .spec(unknownResourceResponseSpec)
                 .extract()
-                .response();
+                .response());
 
-        assertThat(response.getStatusCode()).isEqualTo(404);
+        step("Check response", ()->
+            assertThat(response.getStatusCode()).isEqualTo(404)
+        );
     }
 
     @Test
@@ -125,7 +125,8 @@ public class ReqTests extends TestBase {
 
         int pageNum = 1;
 
-        Response response = given(usersListRequestSpec)
+        UsersListResponseBodyModel response = step("Make get users list request", () ->
+                given(usersListRequestSpec)
                 .queryParam("page", pageNum)
 
                 .when()
@@ -133,9 +134,16 @@ public class ReqTests extends TestBase {
 
                 .then()
                 .spec(usersListResponseSpec)
-                .extract().response();
+                .extract()
+                .as(UsersListResponseBodyModel.class));
 
-        assertThat(response.getStatusCode()).isEqualTo(200);
-        assertThat(response.getBody().asString()).contains("\"id\":1,\"email\":\"george.bluth@reqres.in\"");
+
+        step("Check response", ()-> {
+            assertThat(response.getPage()).isEqualTo(1);
+            assertThat(response.getPer_page()).isEqualTo(6);
+            assertThat(response.getTotal()).isNotNull();
+            assertThat(response.getTotal_pages()).isNotNull();
+            assertThat(response.getData()).isNotNull();
+        });
     }
 }
