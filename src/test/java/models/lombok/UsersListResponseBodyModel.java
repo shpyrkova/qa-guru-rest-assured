@@ -1,9 +1,17 @@
 package models.lombok;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
 public class UsersListResponseBodyModel {
-    Integer page, per_page, total, total_pages;
-    Object data, support;
+    private Integer page, total;
+
+    @JsonProperty("per_page")
+    private Integer perPage;
+
+    @JsonProperty("total_pages")
+    private Integer totalPages;
+
+    private Object data, support;
 }

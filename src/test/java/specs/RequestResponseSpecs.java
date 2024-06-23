@@ -9,23 +9,34 @@ import static io.restassured.RestAssured.with;
 import static io.restassured.filter.log.LogDetail.*;
 import static io.restassured.http.ContentType.JSON;
 
-public class RegisterSpec {
-    public static RequestSpecification registerRequestSpec = with()
+public class RequestResponseSpecs {
+    public static RequestSpecification requestSpec = with()
             .filter(withCustomTemplates())
             .log().uri()
             .log().body()
             .log().headers()
-            .contentType(JSON)
-            .basePath("/register");
+            .contentType(JSON);
 
-    public static ResponseSpecification registerResponseSpec = new ResponseSpecBuilder()
+    public static ResponseSpecification successResponseSpec = new ResponseSpecBuilder()
             .expectStatusCode(200)
             .log(STATUS)
             .log(BODY)
             .build();
 
-    public static ResponseSpecification registerMissingPasswordResponseSpec = new ResponseSpecBuilder()
+    public static ResponseSpecification createdResponseSpec = new ResponseSpecBuilder()
+            .expectStatusCode(201)
+            .log(STATUS)
+            .log(BODY)
+            .build();
+
+    public static ResponseSpecification badRequestResponseSpec = new ResponseSpecBuilder()
             .expectStatusCode(400)
+            .log(STATUS)
+            .log(BODY)
+            .build();
+
+    public static ResponseSpecification unknownResourceResponseSpec = new ResponseSpecBuilder()
+            .expectStatusCode(404)
             .log(STATUS)
             .log(BODY)
             .build();

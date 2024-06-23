@@ -4,5 +4,5 @@ import lombok.Data;
 
 @Data
 public class RegisterRequestBodyModel {
-    String email, password;
+    private String email, password;
 }

@@ -8,33 +8,24 @@ import org.junit.jupiter.api.Test;
 import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.*;
-import static specs.CreateUserSpec.createUserRequestSpec;
-import static specs.CreateUserSpec.createUserResponseSpec;
-import static specs.RegisterSpec.*;
-import static specs.UnknownResourceSpec.unknownResourceRequestSpec;
-import static specs.UnknownResourceSpec.unknownResourceResponseSpec;
-import static specs.UsersListSpec.usersListRequestSpec;
-import static specs.UsersListSpec.usersListResponseSpec;
+import static specs.RequestResponseSpecs.*;
 
 public class ReqTests extends TestBase {
 
     @Test
     @DisplayName("Успешное создание пользователя")
     void successfulCreateUserTest() {
-
         CreateUserRequestBodyModel userData = new CreateUserRequestBodyModel();
         userData.setName("daria");
         userData.setJob("leader");
 
         CreateUserResponseBodyModel response = step("Make create user request", () ->
-                given(createUserRequestSpec)
+                given(requestSpec)
                 .body(userData)
-
                 .when()
-                .post()
-
+                .post("/users")
                 .then()
-                .spec(createUserResponseSpec)
+                .spec(createdResponseSpec)
                 .extract()
                 .as(CreateUserResponseBodyModel.class));
 
@@ -49,20 +40,17 @@ public class ReqTests extends TestBase {
     @Test
     @DisplayName("Успешная регистрация пользователя")
     void successfulRegisterTest() {
-
         RegisterRequestBodyModel registerData = new RegisterRequestBodyModel();
         registerData.setEmail("eve.holt@reqres.in");
         registerData.setPassword("pistol");
 
         RegisterResponseBodyModel response = step("Make register request", () ->
-                given(registerRequestSpec)
+                given(requestSpec)
                 .body(registerData)
-
                 .when()
-                .post()
-
+                .post("/register")
                 .then()
-                .spec(registerResponseSpec)
+                .spec(successResponseSpec)
                 .extract()
                 .as(RegisterResponseBodyModel.class));
 
@@ -75,19 +63,16 @@ public class ReqTests extends TestBase {
     @Test
     @DisplayName("Попытка регистрации пользователя без пароля")
     void unsuccessfulRegisterTest() {
-
         RegisterRequestBodyModel registerData = new RegisterRequestBodyModel();
         registerData.setEmail("eve.holt@reqres.in");
 
         RegisterResponseBodyModel response = step("Make register request without password", () ->
-                given(registerRequestSpec)
+                given(requestSpec)
                 .body(registerData)
-
                 .when()
-                .post()
-
+                .post("/register")
                 .then()
-                .spec(registerMissingPasswordResponseSpec)
+                .spec(badRequestResponseSpec)
                 .extract()
                 .as(RegisterResponseBodyModel.class));
 
@@ -100,15 +85,12 @@ public class ReqTests extends TestBase {
     @Test
     @DisplayName("Попытка получения ресурса с несуществующим id")
     void getNotFoundResourceTest() {
-
         int id = 467898908;
 
-        Response response =  step("Make get unknown id request", () ->
-                given(unknownResourceRequestSpec)
-
+        Response response = step("Make get unknown id request", () ->
+                given(requestSpec)
                 .when()
                 .get("/unknown/" + id)
-
                 .then()
                 .spec(unknownResourceResponseSpec)
                 .extract()
@@ -122,27 +104,23 @@ public class ReqTests extends TestBase {
     @Test
     @DisplayName("Успешное получение списка пользователей")
     void successfulListUsersTest() {
-
         int pageNum = 1;
 
         UsersListResponseBodyModel response = step("Make get users list request", () ->
-                given(usersListRequestSpec)
+                given(requestSpec)
                 .queryParam("page", pageNum)
-
                 .when()
-                .get()
-
+                .get("/users")
                 .then()
-                .spec(usersListResponseSpec)
+                .spec(successResponseSpec)
                 .extract()
                 .as(UsersListResponseBodyModel.class));
 
-
         step("Check response", ()-> {
             assertThat(response.getPage()).isEqualTo(1);
-            assertThat(response.getPer_page()).isEqualTo(6);
+            assertThat(response.getPerPage()).isEqualTo(6);
             assertThat(response.getTotal()).isNotNull();
-            assertThat(response.getTotal_pages()).isNotNull();
+            assertThat(response.getTotalPages()).isNotNull();
             assertThat(response.getData()).isNotNull();
         });
     }
